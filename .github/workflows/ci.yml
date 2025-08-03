@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: med_order_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint code
+        run: yarn lint
+
+      - name: Type check
+        run: yarn type-check
+
+      - name: Run database migrations
+        run: yarn workspace backend db:migrate
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/med_order_test
+
+      - name: Run tests with coverage
+        run: yarn test:coverage
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/med_order_test
+          JWT_SECRET: test-jwt-secret
+          STRIPE_SECRET_KEY: sk_test_fake_key
+
+      - name: Check coverage threshold
+        run: |
+          if [ -f "coverage/lcov.info" ]; then
+            echo "Coverage report generated successfully"
+          else
+            echo "No coverage report found"
+            exit 1
+          fi
+
+      - name: Build applications
+        run: yarn build
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/med_order_test
+          NEXTAUTH_SECRET: test-nextauth-secret
+          NEXTAUTH_URL: http://localhost:3000

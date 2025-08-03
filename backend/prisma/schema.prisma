@@ -1,0 +1,121 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      Role     @default(PATIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders Order[] @relation("DoctorOrders")
+
+  @@map("users")
+}
+
+model Product {
+  id             String    @id @default(uuid())
+  name           String
+  sku            String    @unique
+  priceCents     Int
+  quantity       Int       @default(0)
+  expirationDate DateTime?
+  parLevel       Int       @default(10)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  patientName  String
+  patientEmail String
+  doctorId     String?
+  totalCents   Int
+  status       OrderStatus @default(PENDING)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  doctor      User?        @relation("DoctorOrders", fields: [doctorId], references: [id])
+  items       OrderItem[]
+  payments    Payment[]
+  pharmacyLog PharmacyLog?
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+  @@map("order_items")
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  orderId               String
+  stripePaymentIntentId String        @unique
+  status                PaymentStatus @default(PENDING)
+  amountCents           Int
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model PharmacyLog {
+  id              String   @id @default(uuid())
+  orderId         String   @unique
+  requestPayload  Json
+  responsePayload Json?
+  status          String
+  timestamp       DateTime @default(now())
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("pharmacy_logs")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
