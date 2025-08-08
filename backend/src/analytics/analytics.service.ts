@@ -122,4 +122,96 @@ export class AnalyticsService {
       monthlyOrders,
     };
   }
+
+  async getPaymentAnalytics() {
+    // Get all payments data
+    const totalPayments = await this.prisma.payment.count();
+    
+    const totalRevenue = await this.prisma.payment.aggregate({
+      where: {
+        status: 'SUCCEEDED',
+      },
+      _sum: {
+        amountCents: true,
+      },
+    });
+
+    const averageOrderValue = await this.prisma.payment.aggregate({
+      where: {
+        status: 'SUCCEEDED',
+      },
+      _avg: {
+        amountCents: true,
+      },
+    });
+
+    // Today's payments
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const paymentsToday = await this.prisma.payment.count({
+      where: {
+        createdAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+      },
+    });
+
+    const revenueTodayData = await this.prisma.payment.aggregate({
+      where: {
+        status: 'SUCCEEDED',
+        createdAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+      },
+      _sum: {
+        amountCents: true,
+      },
+    });
+
+    // Success rate calculation
+    const successfulPayments = await this.prisma.payment.count({
+      where: {
+        status: 'SUCCEEDED',
+      },
+    });
+
+    const successRate = totalPayments > 0 ? (successfulPayments / totalPayments) * 100 : 0;
+
+    // Recent payments
+    const recentPayments = await this.prisma.payment.findMany({
+      take: 10,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        order: {
+          select: {
+            patientName: true,
+          },
+        },
+      },
+    });
+
+    return {
+      totalPayments,
+      totalRevenueCents: totalRevenue._sum.amountCents || 0,
+      averageOrderValueCents: Math.round(averageOrderValue._avg.amountCents || 0),
+      paymentsToday,
+      revenueTodayCents: revenueTodayData._sum.amountCents || 0,
+      successRate: Math.round(successRate * 100) / 100, // Round to 2 decimal places
+      recentPayments: recentPayments.map(payment => ({
+        id: payment.id,
+        orderId: payment.orderId,
+        amount: payment.amountCents,
+        status: payment.status,
+        patientName: payment.order.patientName,
+        createdAt: payment.createdAt.toISOString(),
+      })),
+    };
+  }
 }

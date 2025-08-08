@@ -30,7 +30,15 @@ export class OrdersController {
     type: OrderResponseDto,
   })
   async create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+    console.log('📝 Received order creation request:', createOrderDto);
+    try {
+      const result = await this.ordersService.create(createOrderDto);
+      console.log('✅ Order created successfully:', result.id);
+      return result;
+    } catch (error) {
+      console.error('❌ Order creation failed:', error);
+      throw error;
+    }
   }
 
   @Get()
@@ -102,5 +110,19 @@ export class OrdersController {
   })
   async generateCheckoutLink(@Param('id') id: string) {
     return this.ordersService.generateCheckoutLink(id);
+  }
+
+  @Post(':id/send-payment-link')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Send payment link via email or SMS' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment link sent successfully',
+  })
+  async sendPaymentLink(
+    @Param('id') id: string,
+    @Body() body: { method: 'email' | 'sms' | 'text'; phone?: string },
+  ) {
+    return this.ordersService.sendPaymentLink(id, body.method, body.phone);
   }
 }

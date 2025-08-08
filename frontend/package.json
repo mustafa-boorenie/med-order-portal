@@ -15,6 +15,7 @@
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.9.0",
     "@heroicons/react": "^2.0.18",
+    "@stripe/react-stripe-js": "^3.9.0",
     "@stripe/stripe-js": "^2.2.0",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.42",

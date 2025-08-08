@@ -11,7 +11,7 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  role      Role     @default(PATIENT)
+  role      Role     @default(DOCTOR)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -19,6 +19,20 @@ model User {
   orders Order[] @relation("DoctorOrders")
 
   @@map("users")
+}
+
+model Patient {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders Order[]
+
+  @@map("patients")
 }
 
 model Product {
@@ -40,8 +54,9 @@ model Product {
 
 model Order {
   id           String      @id @default(uuid())
-  patientName  String
-  patientEmail String
+  patientId    String?
+  patientName  String      // Keep for backwards compatibility
+  patientEmail String      // Keep for backwards compatibility
   doctorId     String?
   totalCents   Int
   status       OrderStatus @default(PENDING)
@@ -49,6 +64,7 @@ model Order {
   updatedAt    DateTime    @updatedAt
 
   // Relations
+  patient     Patient?     @relation(fields: [patientId], references: [id])
   doctor      User?        @relation("DoctorOrders", fields: [doctorId], references: [id])
   items       OrderItem[]
   payments    Payment[]

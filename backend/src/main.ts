@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -15,6 +16,9 @@ async function bootstrap() {
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
   });
+
+  // Stripe webhook requires raw body
+  app.use('/payments/webhooks/stripe', bodyParser.raw({ type: 'application/json' }));
 
   // Global validation pipe
   app.useGlobalPipes(

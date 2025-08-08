@@ -5,9 +5,11 @@ import {
   ShoppingCartIcon, 
   UserGroupIcon, 
   CubeIcon,
-  ChartBarIcon 
+  ChartBarIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 export default function AdminPage() {
   return (
@@ -21,7 +23,7 @@ export default function AdminPage() {
               <Link href="/dashboard" className="btn btn-secondary">
                 Dashboard
               </Link>
-              <button className="btn btn-primary">Logout</button>
+              <LogoutButton />
             </nav>
           </div>
         </div>
@@ -29,7 +31,7 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
             <Link
               href="/admin/products"
               className="card hover:shadow-lg transition-shadow cursor-pointer"
@@ -41,6 +43,21 @@ export default function AdminPage() {
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Products</h3>
                   <p className="text-sm text-gray-600">Manage product catalog</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/admin/stock"
+              className="card hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-blue-500"
+            >
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <ArrowPathIcon className="h-8 w-8 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900">Stock Orders</h3>
+                  <p className="text-sm text-gray-600">Replenish inventory</p>
                 </div>
               </div>
             </Link>

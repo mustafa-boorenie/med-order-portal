@@ -9,6 +9,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { UsersModule } from './users/users.module';
 import { PharmacyModule } from './pharmacy/pharmacy.module';
+import { PatientsModule } from './patients/patients.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -26,6 +27,7 @@ import { AppService } from './app.service';
     AnalyticsModule,
     UsersModule,
     PharmacyModule,
+    PatientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

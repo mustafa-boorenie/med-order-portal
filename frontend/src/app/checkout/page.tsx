@@ -3,15 +3,99 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+function CheckoutForm({ clientSecret, orderId }: { clientSecret: string; orderId: string }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      setError('Payment system is not ready. Please try again.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // Validate form before submitting
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        setError(submitError.message || 'Please check your payment information');
+        setIsProcessing(false);
+        return;
+      }
+
+      console.log('💳 Submitting payment for order:', orderId);
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/checkout/success?orderId=${orderId}`,
+        },
+      });
+
+      if (error) {
+        console.error('💥 Payment confirmation failed:', error);
+        
+        // Provide more specific error messages
+        if (error.type === 'card_error') {
+          setError(`Card Error: ${error.message}`);
+        } else if (error.type === 'validation_error') {
+          setError(`Please check your payment information: ${error.message}`);
+        } else {
+          setError(error.message || 'Payment failed. Please try again.');
+        }
+        setIsProcessing(false);
+      }
+      // If no error, user will be redirected to success page
+    } catch (unexpectedError) {
+      console.error('💥 Unexpected error during payment:', unexpectedError);
+      setError('An unexpected error occurred. Please try again.');
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <PaymentElement />
+      
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+      
+      <button
+        type="submit"
+        disabled={!stripe || isProcessing}
+        className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isProcessing ? 'Processing...' : 'Pay Now'}
+      </button>
+    </form>
+  );
+}
+
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams?.get('token');
   const [orderData, setOrderData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -21,8 +105,9 @@ export default function CheckoutPage() {
     }
 
     // Verify token and get order data
-    const verifyToken = async () => {
+    const initializeCheckout = async () => {
       try {
+        // Verify token
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-checkout-token`, {
           method: 'POST',
           headers: {
@@ -45,6 +130,26 @@ export default function CheckoutPage() {
 
         const order = await orderResponse.json();
         setOrderData(order);
+
+        // Create payment intent immediately
+        const paymentStartTime = Date.now();
+        const paymentResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-intent`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ orderId: order.id }),
+        });
+
+        if (!paymentResponse.ok) {
+          throw new Error('Failed to create payment intent');
+        }
+
+        const paymentData = await paymentResponse.json();
+        const paymentTime = Date.now() - paymentStartTime;
+        console.log(`Payment intent created in ${paymentTime}ms`);
+        
+        setClientSecret(paymentData.clientSecret);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -52,48 +157,8 @@ export default function CheckoutPage() {
       }
     };
 
-    verifyToken();
+    initializeCheckout();
   }, [token]);
-
-  const handlePayment = async () => {
-    if (!orderData) return;
-
-    try {
-      // Create payment intent
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-intent`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orderId: orderData.id }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create payment intent');
-      }
-
-      const { clientSecret } = await response.json();
-      const stripe = await stripePromise;
-
-      if (!stripe) {
-        throw new Error('Stripe not loaded');
-      }
-
-      // Redirect to Stripe Checkout or use Elements
-      const { error } = await stripe.confirmPayment({
-        clientSecret,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
-        },
-      });
-
-      if (error) {
-        setError(error.message || 'Payment failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment failed');
-    }
-  };
 
   if (loading) {
     return (
@@ -151,14 +216,13 @@ export default function CheckoutPage() {
                 <p><strong>Email:</strong> {orderData.patientEmail}</p>
               </div>
 
-              <button
-                onClick={handlePayment}
-                className="w-full btn btn-primary text-lg py-3"
-              >
-                Pay ${(orderData.totalCents / 100).toFixed(2)}
-              </button>
+              {clientSecret && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <CheckoutForm clientSecret={clientSecret} orderId={orderData.id} />
+                </Elements>
+              )}
 
-              <p className="mt-4 text-sm text-gray-600 text-center">
+              <p className="mt-6 text-sm text-gray-600 text-center">
                 Your payment is secured by Stripe. We never store your payment information.
               </p>
             </>

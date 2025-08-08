@@ -13,6 +13,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AnalyticsData } from '@/types';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 export default function DashboardPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
@@ -74,7 +75,7 @@ export default function DashboardPage() {
               <Link href="/products" className="btn btn-secondary">
                 Products
               </Link>
-              <button className="btn btn-primary">Logout</button>
+              <LogoutButton />
             </nav>
           </div>
         </div>

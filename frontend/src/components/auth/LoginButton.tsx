@@ -4,6 +4,10 @@ import Link from 'next/link';
 export function LoginButton() {
   const { user, isLoading } = useUser();
 
+  const handleLogout = () => {
+    window.location.href = '/api/auth/logout';
+  };
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -18,12 +22,12 @@ export function LoginButton() {
       ) : (
         <div className="flex items-center gap-4">
           <span>Welcome, {user.name}!</span>
-          <Link
-            href="/api/auth/logout"
+          <button
+            onClick={handleLogout}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           >
             Log Out
-          </Link>
+          </button>
         </div>
       )}
     </div>

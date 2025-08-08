@@ -24,6 +24,15 @@ async function main() {
     },
   });
 
+  const drMustafa = await prisma.user.upsert({
+    where: { email: 'drmustafa@bdqholdings.com' },
+    update: {},
+    create: {
+      email: 'drmustafa@bdqholdings.com',
+      role: Role.ADMIN,
+    },
+  });
+
   console.log(`👤 Created users: Admin (${adminUser.id}), Doctor (${doctorUser.id})`);
 
   // Create products

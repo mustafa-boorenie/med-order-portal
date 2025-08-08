@@ -65,6 +65,9 @@ export default function AdminProductsPage() {
               <Link href="/admin" className="btn btn-secondary">
                 Back to Admin
               </Link>
+              <Link href="/admin/stock" className="btn btn-secondary">
+                📦 Order Stock
+              </Link>
               <button className="btn btn-primary">
                 <PlusIcon className="h-5 w-5 mr-2" />
                 Add Product

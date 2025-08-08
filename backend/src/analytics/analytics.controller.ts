@@ -31,4 +31,11 @@ export class AnalyticsController {
   async getRevenueAnalytics() {
     return this.analyticsService.getRevenueAnalytics();
   }
+
+  @Get('payments')
+  @ApiOperation({ summary: 'Get payment analytics' })
+  @ApiResponse({ status: 200, description: 'Payment analytics data' })
+  async getPaymentAnalytics() {
+    return this.analyticsService.getPaymentAnalytics();
+  }
 }

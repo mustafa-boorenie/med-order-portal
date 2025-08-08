@@ -3,6 +3,18 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { FhirService } from './fhir.service';
 
+interface ProductRow {
+  id: string;
+  name: string;
+  sku: string;
+  priceCents: number;
+  quantity: number;
+  expirationDate: Date | null;
+  parLevel: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 @Injectable()
 export class PharmacyService {
   constructor(
@@ -79,13 +91,11 @@ export class PharmacyService {
   async checkLowStockAndAlert() {
     console.log('🔍 Checking for low stock items...');
     
-    const lowStockItems = await this.prisma.product.findMany({
-      where: {
-        quantity: {
-          lt: this.prisma.product.fields.parLevel,
-        },
-      },
-    });
+    // Use raw SQL to compare quantity with parLevel
+    const lowStockItems = await this.prisma.$queryRaw<ProductRow[]>`
+      SELECT * FROM products 
+      WHERE quantity < "parLevel"
+    `;
 
     if (lowStockItems.length > 0) {
       console.log(`⚠️  Found ${lowStockItems.length} low stock items:`, 
@@ -99,7 +109,7 @@ export class PharmacyService {
     }
   }
 
-  private async sendLowStockAlert(items: any[]) {
+  private async sendLowStockAlert(items: ProductRow[]) {
     // Mock email service
     console.log('📧 Sending low stock alert email...');
     console.log('Recipients: admin@medportal.com, inventory@medportal.com');
