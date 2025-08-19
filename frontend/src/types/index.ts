@@ -10,6 +10,7 @@ export interface Product {
   name: string;
   sku: string;
   priceCents: number;
+  costCents?: number;
   quantity: number;
   expirationDate?: string;
   parLevel: number;
@@ -73,4 +74,5 @@ export interface AnalyticsData {
   }>;
   totalRevenue: number;
   totalOrders: number;
+  patientsCount?: number;
 }

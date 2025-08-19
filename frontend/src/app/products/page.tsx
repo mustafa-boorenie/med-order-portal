@@ -88,7 +88,7 @@ export default function ProductsPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600">Error: {error}</p>
+          <p className="text-gray-800">Error: {error}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 btn btn-primary"
@@ -102,18 +102,7 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Order Products</h1>
-            <nav className="flex space-x-4">
-              <a href="/dashboard" className="btn btn-secondary">
-                Dashboard
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
+
 
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

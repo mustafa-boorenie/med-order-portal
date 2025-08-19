@@ -14,6 +14,8 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
+import { AdminGuard } from '../common/admin.guard';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto, ProductResponseDto } from './dto';
 
@@ -48,6 +50,7 @@ export class ProductsController {
 
   @Post()
   @ApiBearerAuth()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiResponse({
     status: 201,
@@ -60,6 +63,7 @@ export class ProductsController {
 
   @Patch(':id')
   @ApiBearerAuth()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({
     status: 200,
@@ -76,6 +80,7 @@ export class ProductsController {
 
   @Delete(':id')
   @ApiBearerAuth()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Delete a product' })
   @ApiResponse({ status: 200, description: 'Product deleted successfully' })
   @ApiResponse({ status: 404, description: 'Product not found' })
@@ -85,6 +90,7 @@ export class ProductsController {
 
   @Get('low-stock/alerts')
   @ApiBearerAuth()
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Get products with low stock' })
   @ApiResponse({
     status: 200,

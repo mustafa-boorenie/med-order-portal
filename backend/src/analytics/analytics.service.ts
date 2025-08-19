@@ -214,4 +214,9 @@ export class AnalyticsService {
       })),
     };
   }
+
+  async getPatientsCount() {
+    const count = await this.prisma.patient.count();
+    return { count };
+  }
 }

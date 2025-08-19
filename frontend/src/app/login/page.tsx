@@ -22,11 +22,8 @@ export default function LoginPage() {
     }, 1000);
   };
 
-  const handleOktaLogin = () => {
-    // TODO: Implement Okta OAuth2 flow
-    console.log('Initiating Okta login...');
-    // For now, redirect to dashboard
-    window.location.href = '/dashboard';
+  const handleGoogleLogin = () => {
+    window.location.href = '/api/auth/login?provider=google&returnTo=/dashboard';
   };
 
   return (
@@ -98,10 +95,10 @@ export default function LoginPage() {
 
             <div className="mt-6">
               <button
-                onClick={handleOktaLogin}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                onClick={handleGoogleLogin}
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                <span>Okta SSO</span>
+                <span>Continue with Google</span>
               </button>
             </div>
           </div>

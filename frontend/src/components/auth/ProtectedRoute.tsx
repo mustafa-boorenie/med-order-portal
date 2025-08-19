@@ -29,15 +29,23 @@ export function ProtectedRoute({
   if (!user) return null;
 
   // Check role if required
-  if (requiredRole && user['https://medportal.com/roles'] !== requiredRole) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You don't have permission to access this page.</p>
+  if (requiredRole) {
+    const rolesClaim = user['https://medportal.com/roles'];
+    const adminEmailsEnv = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(Boolean);
+    const userEmail = (user as any).email as string | undefined;
+    const isEmailAdmin = !!userEmail && adminEmailsEnv.includes(userEmail);
+    const hasRequiredRole = rolesClaim === requiredRole || (requiredRole === 'ADMIN' && isEmailAdmin);
+
+    if (!hasRequiredRole) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-black mb-4">Access Denied</h1>
+            <p className="text-gray-600">You don't have permission to access this page.</p>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   return <>{children}</>;

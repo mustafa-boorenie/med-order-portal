@@ -176,12 +176,12 @@ export default function PatientModal({ isOpen, onClose, onSelectPatient, current
 
             {/* Current Patient */}
             {currentPatient && !searchTerm && (
-              <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm font-medium text-blue-900">Current Patient</p>
-                <p className="text-sm text-blue-700">{currentPatient.name}</p>
-                <p className="text-sm text-blue-600">{currentPatient.email}</p>
+              <div className="mb-4 p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+                <p className="text-sm font-medium text-neutral-900">Current Patient</p>
+                <p className="text-sm text-neutral-700">{currentPatient.name}</p>
+                <p className="text-sm text-neutral-700">{currentPatient.email}</p>
                 {currentPatient.phone && (
-                  <p className="text-sm text-blue-600">{currentPatient.phone}</p>
+                  <p className="text-sm text-neutral-700">{currentPatient.phone}</p>
                 )}
               </div>
             )}

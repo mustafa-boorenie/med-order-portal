@@ -1,12 +1,12 @@
-import { Controller, Get, Patch, Param, Delete, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Delete, Body, UseGuards, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UpdateUserDto } from './dto';
+import { AdminGuard } from '../common/admin.guard';
+import { UpdateUserDto, CreateUserDto } from './dto';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(AdminGuard)
 @ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -16,6 +16,13 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'List of all users' })
   async findAll() {
     return this.usersService.findAll();
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create user' })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Get(':id')

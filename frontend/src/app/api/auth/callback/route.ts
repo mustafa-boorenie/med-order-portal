@@ -42,7 +42,8 @@ export async function GET(request: NextRequest) {
     }
     
     const auth0Domain = auth0IssuerBaseUrl.replace(/^https?:\/\//, '');
-    const baseUrl = process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+    // Use runtime origin to build redirect_uri to avoid env drift.
+    const origin = new URL(request.url).origin;
     
     const tokenResponse = await fetch(`https://${auth0Domain}/oauth/token`, {
       method: 'POST',
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
         client_id: clientId,
         client_secret: clientSecret,
         code,
-        redirect_uri: `${baseUrl}/api/auth/callback`,
+        redirect_uri: `${origin}/api/auth/callback`,
       }),
     });
     
@@ -83,6 +84,17 @@ export async function GET(request: NextRequest) {
     
     const user = await userResponse.json();
     
+    // Persist/Upsert user in backend and auto-assign admin based on env
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sso-upsert`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email }),
+      });
+    } catch (e) {
+      console.warn('SSO upsert failed:', e);
+    }
+
     // Create session
     const sessionData = {
       user,

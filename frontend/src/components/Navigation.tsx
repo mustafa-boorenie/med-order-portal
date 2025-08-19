@@ -8,35 +8,18 @@ import { useCart } from '@/contexts/CartContext';
 export function Navigation() {
   const { user } = useUser();
   const { itemCount } = useCart();
+  const role = user?.['https://medportal.com/roles'];
+  const canSeeAdmin = role === 'ADMIN' || role === 'DOCTOR';
 
   return (
-    <nav className="bg-blue-600 text-white p-4">
+    <nav className="bg-transparent backdrop-blur-sm text-primary-600 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="flex space-x-4">
-          <Link href="/" className="font-bold text-xl">
-            Medical Order Portal
+        <div className="flex space-x-4 items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            {/* Logo image slot */}
+            <img src="/cls-logo.jpg" alt="CLS Health" className="h-6 w-auto" />
           </Link>
           
-          {user && (
-            <>
-              <Link href="/dashboard" className="hover:underline">
-                Dashboard
-              </Link>
-              <Link href="/products" className="hover:underline relative">
-                Products
-                {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {itemCount}
-                  </span>
-                )}
-              </Link>
-              {user['https://medportal.com/roles'] === 'ADMIN' && (
-                <Link href="/admin" className="hover:underline">
-                  Admin
-                </Link>
-              )}
-            </>
-          )}
         </div>
         
         <LoginButton />

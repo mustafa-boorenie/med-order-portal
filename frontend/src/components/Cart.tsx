@@ -10,7 +10,7 @@ export default function Cart({ orderType = 'patient' }: { orderType?: 'patient' 
   const { user } = useUser();
   const router = useRouter();
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
-  const [sendMethod, setSendMethod] = useState<'text' | 'email' | 'direct'>('email');
+  const [sendMethod, setSendMethod] = useState<'text' | 'email' | 'direct' | 'link'>('email');
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
 
@@ -208,9 +208,9 @@ export default function Cart({ orderType = 'patient' }: { orderType?: 'patient' 
         )}
 
         {orderType === 'stock' && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-medium text-blue-900 mb-2">📦 Stock Replenishment Order</h3>
-            <p className="text-sm text-blue-700">
+          <div className="mt-6 p-4 bg-neutral-50 rounded-lg">
+            <h3 className="font-medium text-neutral-900 mb-2">📦 Stock Replenishment Order</h3>
+            <p className="text-sm text-neutral-700">
               This order will add inventory to your medical supplies. No payment required.
             </p>
           </div>
@@ -244,17 +244,7 @@ export default function Cart({ orderType = 'patient' }: { orderType?: 'patient' 
                 />
                 Send payment link via text message
               </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="sendMethod"
-                  value="link"
-                  checked={sendMethod === 'link'}
-                  onChange={(e) => setSendMethod(e.target.value as any)}
-                  className="mr-2"
-                />
-                Generate link only
-              </label>
+  
               <label className="flex items-center">
                 <input
                   type="radio"

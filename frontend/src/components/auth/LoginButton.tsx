@@ -15,16 +15,18 @@ export function LoginButton() {
       {!user ? (
         <Link
           href="/api/auth/login"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-black hover:bg-neutral-900 text-white font-bold py-2 px-4 rounded"
         >
           Log In
         </Link>
       ) : (
         <div className="flex items-center gap-4">
-          <span>Welcome, {user.name}!</span>
+          <Link href="/admin" className="hover:underline">
+            Admin Portal
+          </Link>
           <button
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-neutral-800 hover:bg-black text-white font-bold py-2 px-4 rounded"
           >
             Log Out
           </button>

@@ -40,6 +40,7 @@ model Product {
   name           String
   sku            String    @unique
   priceCents     Int
+  costCents      Int       @default(0)
   quantity       Int       @default(0)
   expirationDate DateTime?
   parLevel       Int       @default(10)

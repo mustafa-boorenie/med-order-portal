@@ -1,11 +1,11 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Auth0Guard } from '../auth/guards/auth0.guard';
 
 @ApiTags('Analytics')
 @Controller('analytics')
-@UseGuards(JwtAuthGuard)
+@UseGuards(Auth0Guard)
 @ApiBearerAuth()
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
@@ -37,5 +37,12 @@ export class AnalyticsController {
   @ApiResponse({ status: 200, description: 'Payment analytics data' })
   async getPaymentAnalytics() {
     return this.analyticsService.getPaymentAnalytics();
+  }
+
+  @Get('patients-count')
+  @ApiOperation({ summary: 'Get total patients count' })
+  @ApiResponse({ status: 200, description: 'Total number of patients' })
+  async getPatientsCount() {
+    return this.analyticsService.getPatientsCount();
   }
 }

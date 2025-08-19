@@ -158,4 +158,18 @@ export class AuthService {
     }
     return null;
   }
+
+  async ssoUpsert(email: string, role?: 'ADMIN' | 'DOCTOR' | 'PATIENT') {
+    const adminEmailsEnv = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+    const isEnvAdmin = adminEmailsEnv.includes(email.toLowerCase());
+    const finalRole = role || (isEnvAdmin ? 'ADMIN' : 'PATIENT');
+
+    const user = await this.prisma.user.upsert({
+      where: { email },
+      update: { role: finalRole },
+      create: { email, role: finalRole },
+    });
+
+    return { id: user.id, email: user.email, role: user.role };
+  }
 }

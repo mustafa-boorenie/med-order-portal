@@ -53,65 +53,6 @@ export default function HomePage() {
             </div>
           )}
         </div>
-
-        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="card text-center">
-            <div className="flex justify-center">
-              <ShoppingCartIcon className="h-12 w-12 text-primary-600" />
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">Easy Ordering</h3>
-            <p className="mt-2 text-gray-600">
-              Streamlined product catalog with quick order placement and secure payment processing.
-            </p>
-            {user ? (
-              <Link href="/products" className="mt-4 inline-block btn btn-primary">
-                Browse Products
-              </Link>
-            ) : (
-              <Link href="/api/auth/login" className="mt-4 inline-block btn btn-primary">
-                Sign In to Order
-              </Link>
-            )}
-          </div>
-
-          <div className="card text-center">
-            <div className="flex justify-center">
-              <UserIcon className="h-12 w-12 text-primary-600" />
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">Doctor Portal</h3>
-            <p className="mt-2 text-gray-600">
-              Secure login for clinicians to manage patient orders and track inventory.
-            </p>
-            {user ? (
-              <Link href="/dashboard" className="mt-4 inline-block btn btn-primary">
-                Go to Dashboard
-              </Link>
-            ) : (
-              <Link href="/api/auth/login" className="mt-4 inline-block btn btn-primary">
-                Doctor Login
-              </Link>
-            )}
-          </div>
-
-          <div className="card text-center">
-            <div className="flex justify-center">
-              <ChartBarIcon className="h-12 w-12 text-primary-600" />
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">Analytics</h3>
-            <p className="mt-2 text-gray-600">
-              Real-time insights into inventory, orders, and revenue for administrators.
-            </p>
-            {user ? (
-              <Link href="/dashboard" className="mt-4 inline-block btn btn-primary">
-                View Dashboard
-              </Link>
-            ) : (
-              <Link href="/api/auth/login" className="mt-4 inline-block btn btn-primary">
-                Sign In for Analytics
-              </Link>
-            )}
-          </div>
-        </div>
       </main>
     </div>
   );

@@ -24,8 +24,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ user: null }, { status: 401 });
     }
     
-    return NextResponse.json({ user: sessionData.user });
+    // Normalize role claim for frontend ProtectedRoute
+    const user = sessionData.user || {};
+    if (user.email && !user['https://medportal.com/roles']) {
+      // Allow local admin via seed or env-approved email
+      const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(Boolean);
+      if (adminEmails.includes(user.email)) {
+        user['https://medportal.com/roles'] = 'ADMIN';
+      }
+    }
+    return NextResponse.json({ user });
   } catch (error) {
-    return NextResponse.json({ user: null }, { status: 401 });
+    console.error('Auth me route error:', error);
+    return NextResponse.json({ user: null, error: 'Invalid session' }, { status: 401 });
   }
 }

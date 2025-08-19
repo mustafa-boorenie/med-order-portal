@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { passportJwtSecret } from 'jwks-rsa';
 
 @Injectable()
-export class Auth0Strategy extends PassportStrategy(Strategy) {
+export class Auth0Strategy extends PassportStrategy(Strategy, 'auth0') {
   constructor() {
     super({
       secretOrKeyProvider: passportJwtSecret({

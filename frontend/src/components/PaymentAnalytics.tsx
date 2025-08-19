@@ -27,11 +27,7 @@ export default function PaymentAnalytics() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/payments`, {
-          headers: {
-            'Authorization': `Bearer ${await getAuthToken()}`,
-          },
-        });
+        const response = await fetch(`/api/admin/analytics/payments`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch payment analytics');
@@ -48,13 +44,6 @@ export default function PaymentAnalytics() {
 
     fetchAnalytics();
   }, []);
-
-  // Helper function to get auth token (implement based on your auth system)
-  const getAuthToken = async () => {
-    // This would be implemented based on your authentication system
-    // For now, return empty string as placeholder
-    return '';
-  };
 
   if (loading) {
     return (
@@ -100,7 +89,7 @@ export default function PaymentAnalytics() {
               <p className="text-sm font-medium text-gray-600">Total Payments</p>
               <p className="text-2xl font-bold text-gray-900">{analytics.totalPayments}</p>
             </div>
-            <div className="text-blue-500">
+            <div className="text-black">
               💳
             </div>
           </div>
@@ -114,7 +103,7 @@ export default function PaymentAnalytics() {
                 ${(analytics.totalRevenueCents / 100).toFixed(2)}
               </p>
             </div>
-            <div className="text-green-500">
+            <div className="text-black">
               💰
             </div>
           </div>
@@ -128,7 +117,7 @@ export default function PaymentAnalytics() {
                 ${(analytics.averageOrderValueCents / 100).toFixed(2)}
               </p>
             </div>
-            <div className="text-purple-500">
+            <div className="text-black">
               📊
             </div>
           </div>
@@ -140,7 +129,7 @@ export default function PaymentAnalytics() {
               <p className="text-sm font-medium text-gray-600">Success Rate</p>
               <p className="text-2xl font-bold text-gray-900">{analytics.successRate}%</p>
             </div>
-            <div className="text-green-500">
+            <div className="text-black">
               ✅
             </div>
           </div>
@@ -177,13 +166,7 @@ export default function PaymentAnalytics() {
                   <p className="text-sm font-medium text-gray-900">
                     ${(payment.amount / 100).toFixed(2)}
                   </p>
-                  <p className={`text-xs ${
-                    payment.status === 'SUCCEEDED' 
-                      ? 'text-green-600' 
-                      : payment.status === 'FAILED' 
-                      ? 'text-red-600' 
-                      : 'text-yellow-600'
-                  }`}>
+                  <p className={`text-xs text-gray-800`}>
                     {payment.status}
                   </p>
                 </div>

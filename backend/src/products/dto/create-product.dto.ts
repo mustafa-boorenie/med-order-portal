@@ -25,6 +25,12 @@ export class CreateProductDto {
   @IsPositive()
   priceCents: number;
 
+  @ApiProperty({ description: 'Cost in cents (clinic purchase cost)', example: 9500, required: false })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  costCents?: number;
+
   @ApiProperty({ description: 'Quantity in stock', example: 25, default: 0 })
   @IsNumber()
   @Min(0)

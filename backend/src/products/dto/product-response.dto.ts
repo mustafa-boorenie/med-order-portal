@@ -13,6 +13,9 @@ export class ProductResponseDto {
   @ApiProperty({ description: 'Price in cents', example: 12500 })
   priceCents: number;
 
+  @ApiProperty({ description: 'Cost in cents (clinic purchase cost)', example: 9500 })
+  costCents: number;
+
   @ApiProperty({ description: 'Quantity in stock', example: 25 })
   quantity: number;
 

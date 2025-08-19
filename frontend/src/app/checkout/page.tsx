@@ -73,7 +73,7 @@ function CheckoutForm({ clientSecret, orderId }: { clientSecret: string; orderId
       <PaymentElement />
       
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+        <div className="p-3 bg-neutral-100 border border-neutral-200 text-black rounded-md">
           {error}
         </div>
       )}
@@ -175,7 +175,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 text-lg">{error}</p>
+          <p className="text-gray-800 text-lg">{error}</p>
           <a href="/" className="mt-4 inline-block btn btn-primary">
             Return Home
           </a>

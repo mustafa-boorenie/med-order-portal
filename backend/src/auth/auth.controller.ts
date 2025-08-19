@@ -49,4 +49,10 @@ export class AuthController {
   async verifyCheckoutToken(@Body() body: { token: string }) {
     return this.authService.verifyCheckoutToken(body.token);
   }
+
+  @Post('sso-upsert')
+  @ApiOperation({ summary: 'Upsert user from SSO' })
+  async ssoUpsert(@Body() body: { email: string; role?: 'ADMIN' | 'DOCTOR' | 'PATIENT' }) {
+    return this.authService.ssoUpsert(body.email, body.role);
+  }
 }

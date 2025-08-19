@@ -34,7 +34,10 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     return this.prisma.product.create({
-      data: createProductDto,
+      data: {
+        ...createProductDto,
+        costCents: createProductDto.costCents ?? Math.max(0, Math.floor((createProductDto.priceCents || 0) * 0.6)),
+      },
     });
   }
 
